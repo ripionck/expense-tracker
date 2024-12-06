@@ -100,16 +100,26 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		access_token, refresh_token, err := helpers.GenerateTokens(foundUser.Email, foundUser.Username, foundUser.Name, foundUser.User_ID)
+		accessToken, refreshToken, err := helpers.GenerateTokens(foundUser.Email, foundUser.Username, foundUser.Name, foundUser.User_ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate tokens"})
 			return
 		}
 
+		responseUser := gin.H{
+			"email":      foundUser.Email,
+			"username":   foundUser.Username,
+			"name":       foundUser.Name,
+			"user_id":    foundUser.User_ID,
+			"created_at": foundUser.Created_At,
+			"updated_at": foundUser.Updated_At,
+		}
+
+		// Send response
 		c.JSON(http.StatusOK, gin.H{
-			"access_token":  access_token,
-			"refresh_token": refresh_token,
-			"user":          foundUser,
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+			"user":          responseUser,
 		})
 	}
 }
