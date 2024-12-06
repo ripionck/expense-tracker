@@ -1,6 +1,8 @@
 package main
 
 import (
+	"expense-tracker/pkg/routes"
+	"expense-tracker/pkg/utils"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +13,12 @@ import (
 )
 
 func main() {
+
+	// Initialize the database
+	client := utils.ConnectDB()
+	if client == nil {
+		log.Fatal("Failed to initialize MongoDB connection")
+	}
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
@@ -26,7 +34,7 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
 
-	// routes.AuthRoutes(router)
+	routes.AuthRoutes(router)
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

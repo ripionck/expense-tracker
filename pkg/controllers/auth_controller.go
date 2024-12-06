@@ -74,3 +74,42 @@ func Register() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"message": "user registration successful"})
 	}
 }
+
+func Login() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		var user models.User
+		var foundUser models.User
+
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		err := utils.UserCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "email or password is incorrect"})
+			return
+		}
+
+		passwordIsValid, msg := utils.VerifyPassword(foundUser.Password, user.Password)
+		if !passwordIsValid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+			return
+		}
+
+		access_token, refresh_token, err := helpers.GenerateTokens(foundUser.Email, foundUser.Username, foundUser.Name, foundUser.User_ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate tokens"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"access_token":  access_token,
+			"refresh_token": refresh_token,
+			"user":          foundUser,
+		})
+	}
+}

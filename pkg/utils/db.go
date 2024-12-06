@@ -22,34 +22,35 @@ var (
 )
 
 func ConnectDB() *mongo.Client {
+	// Load .env file
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error loading .env file: %v", err)
+		log.Println("Warning: .env file not loaded. Ensure environment variables are set.")
 	}
 
+	// Get DB URI
 	uri := os.Getenv("DB_URI")
 	if uri == "" {
-		log.Fatal("DB_URI environment variable not set")
+		log.Fatal("Error: DB_URI is not set in environment variables or .env file")
 	}
 
+	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
-		log.Fatal("error connecting to MongoDB:", err)
+		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
-	// Set a timeout for the ping
+	// Ping MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal("failed to connect to MongoDB:", err)
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 
-	fmt.Println("connected to MongoDB")
+	fmt.Println("Connected to MongoDB")
 
-	// Set the global Client reference
+	// Set global variables
 	Client = client
-
 	UserCollection = Client.Database("expense_tracker").Collection("users")
 	FundCollection = Client.Database("expense_tracker").Collection("funds")
 	ExpenseCollection = Client.Database("expense_tracker").Collection("expenses")
