@@ -15,6 +15,7 @@ import (
 var (
 	Client             *mongo.Client
 	UserCollection     *mongo.Collection
+	BalanceCollection  *mongo.Collection
 	FundCollection     *mongo.Collection
 	ExpenseCollection  *mongo.Collection
 	ReportCollection   *mongo.Collection
@@ -52,6 +53,7 @@ func ConnectDB() *mongo.Client {
 	// Set global variables
 	Client = client
 	UserCollection = Client.Database("expense_tracker").Collection("users")
+	BalanceCollection = Client.Database("expense_tracker").Collection("balance")
 	FundCollection = Client.Database("expense_tracker").Collection("funds")
 	ExpenseCollection = Client.Database("expense_tracker").Collection("expenses")
 	ReportCollection = Client.Database("expense_tracker").Collection("reports")
