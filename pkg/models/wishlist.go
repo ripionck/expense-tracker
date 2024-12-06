@@ -8,7 +8,7 @@ import (
 
 type Wishlist struct {
 	ID         primitive.ObjectID `bson:"_id" json:"id"`
-	ItemName   string             `json:"item_name"`
+	Item_Name  string             `json:"item_name"`
 	Price      float64            `json:"price,omitempty"`
 	Priority   int                `json:"priority,omitempty"`
 	Note       string             `json:"note" validate:"required,min=10,max=120"`
