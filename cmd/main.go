@@ -35,6 +35,8 @@ func main() {
 	router.Use(cors.Default())
 
 	routes.AuthRoutes(router)
+	routes.FundRoutes(router)
+	routes.ExpensesRoutes(router)
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

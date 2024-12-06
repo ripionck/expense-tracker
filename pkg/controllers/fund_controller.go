@@ -4,8 +4,10 @@ import (
 	"expense-tracker/pkg/models"
 	"expense-tracker/pkg/utils"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func AddFunds(c *gin.Context) {
@@ -14,6 +16,10 @@ func AddFunds(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
+
+	fund.Inserted_At = time.Now()
+	fund.ID = primitive.NewObjectID()
+	fund.Fund_ID = fund.ID.Hex()
 
 	_, err := utils.FundCollection.InsertOne(c, fund)
 	if err != nil {
